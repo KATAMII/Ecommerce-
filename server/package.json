@@ -9,7 +9,9 @@
     "dev": "nodemon src/index.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
