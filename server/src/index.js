@@ -18,8 +18,9 @@ const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: ['https://ecommerce-tawny-tau.vercel.app', 'http://localhost:5173'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
   }
 });
 
@@ -28,21 +29,22 @@ const prisma = new PrismaClient();
 // Middleware
 app.use(cors({
   origin: ['https://ecommerce-tawny-tau.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
+// Explicitly handle OPTIONS preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Static files
 app.use('/uploads', express.static('uploads'));
 
-// Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100
 });
-
 app.use(limiter);
 
 // Routes
@@ -50,18 +52,15 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 
-// WebSocket setup
 setupWebSocket(io, prisma);
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   logger.error(err.stack);
-  res.status(500).json({ message: 'Something broke!' });
+  res.status(500).json({ message: 'Something broke!', error: err.message });
 });
 
 const PORT = process.env.PORT || 5000;
 
-// Start server
 const startServer = async () => {
   try {
     await prisma.$connect();
