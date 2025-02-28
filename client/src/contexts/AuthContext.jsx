@@ -2,7 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL?.endsWith('/') 
+  ? import.meta.env.VITE_API_URL.slice(0, -1) 
+  : import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -17,13 +19,21 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
+  // Configure axios defaults
+  useEffect(() => {
+    axios.defaults.withCredentials = true;
+  }, []);
+
   useEffect(() => {
     const initializeAuth = async () => {
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
         try {
-          const response = await axios.get(`${API_URL}api/auth/me`, {
-            headers: { Authorization: `Bearer ${storedToken}` }
+          const response = await axios.get(`${API_URL}/api/auth/me`, {
+            headers: { 
+              Authorization: `Bearer ${storedToken}`,
+              'Content-Type': 'application/json'
+            }
           });
           setUser(response.data);
           setToken(storedToken);
@@ -42,9 +52,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API_URL}api/auth/login`, {
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       const { token, user } = response.data;
       localStorage.setItem('token', token);

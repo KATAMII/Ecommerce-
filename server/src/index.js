@@ -15,9 +15,16 @@ dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);
+
+const allowedOrigins = [
+  'https://ecommerce-l1xa.onrender.com',
+  'https://ecommerce-tawny-tau.vercel.app',
+  'http://localhost:5173'
+];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: ['https://ecommerce-tawny-tau.vercel.app', 'http://localhost:5173'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -28,10 +35,19 @@ const prisma = new PrismaClient();
 
 // Middleware
 app.use(cors({
-  origin: ['https://ecommerce-tawny-tau.vercel.app', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: function(origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 // Explicitly handle OPTIONS preflight requests
