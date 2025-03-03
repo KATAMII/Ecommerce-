@@ -5,21 +5,18 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider, useAuth } from './hooks/useAuth.jsx';
 import theme from './theme';
 
-// Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Products from './pages/Products';
 import AdminProducts from './pages/admin/Products';
 
-// Components
 import Header from './components/Header';
 
-// Protected Route Component
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null; // or a loading spinner
+    return null; 
   }
 
   if (!user) {

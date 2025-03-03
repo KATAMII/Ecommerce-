@@ -1,5 +1,5 @@
 import multer from 'multer';
-import { authenticate, authorizeAdmin } from '../middleware/auth.js';
+import { authenticate, authorizeAdmin } from '../middleware/authMiddleware.js';
 import { productController } from '../controllers/productController.js';
 import { authController } from '../controllers/authController.js';
 

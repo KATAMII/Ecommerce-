@@ -4,7 +4,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { rateLimit } from 'express-rate-limit';
 import { PrismaClient } from '@prisma/client';
-import authRoutes from './routes/auth.js';
+import authController from './controllers/authController.js';
 import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import { setupWebSocket } from './websocket/index.js';
@@ -33,7 +33,6 @@ const io = new Server(httpServer, {
 
 const prisma = new PrismaClient();
 
-// Middleware
 app.use(cors({
   origin: function(origin, callback) {
     // allow requests with no origin (like mobile apps or curl requests)
@@ -64,7 +63,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authController);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 

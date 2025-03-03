@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticate, authorizeAdmin } from '../middleware/auth.js';
+import { authenticate, authorizeAdmin } from '../middleware/authMiddleware.js';
 import { logger } from '../utils/logger.js';
 
 const prisma = new PrismaClient();

@@ -1,7 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { productController } from '../controllers/productController.js';
-import { authenticate, authorizeAdmin } from '../middleware/auth.js';
+import { authenticate, authorizeAdmin } from '../middleware/authMiddleware.js';
 import multer from 'multer';
 import { logger } from '../utils/logger.js';
 
