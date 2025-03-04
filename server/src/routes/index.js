@@ -1,21 +1,25 @@
+import express from 'express';
 import multer from 'multer';
 import { authenticate, authorizeAdmin } from '../middleware/authMiddleware.js';
 import { productController } from '../controllers/productController.js';
 import { authController } from '../controllers/authController.js';
+import { validateRegistration, validateLogin } from '../utils/validators.js';
 
 const upload = multer({ dest: 'uploads/' });
 
-export const configureRoutes = (app, prisma) => {
-  const products = productController(prisma);
-  const auth = authController(prisma);
+const router = express.Router();
 
-  // Auth routes
-  app.post('/api/auth/register', auth.register);
-  app.post('/api/auth/login', auth.login);
+const products = productController(prisma);
+const auth = authController(prisma);
 
-  // Product routes
-  app.get('/api/products', products.getAllProducts);
-  app.post('/api/products', authenticate, authorizeAdmin, upload.single('image'), products.createProduct);
-  app.put('/api/products/:id', authenticate, authorizeAdmin, upload.single('image'), products.updateProduct);
-  app.delete('/api/products/:id', authenticate, authorizeAdmin, products.deleteProduct);
-};
+// Auth routes
+router.post('/api/auth/register', validateRegistration, auth.register);
+router.post('/api/auth/login', validateLogin, auth.login);
+
+// Product routes
+router.get('/api/products', products.getAllProducts);
+router.post('/api/products', authenticate, authorizeAdmin, upload.single('image'), products.createProduct);
+router.put('/api/products/:id', authenticate, authorizeAdmin, upload.single('image'), products.updateProduct);
+router.delete('/api/products/:id', authenticate, authorizeAdmin, products.deleteProduct);
+
+export default router;

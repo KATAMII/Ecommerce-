@@ -5,8 +5,8 @@ import { Server } from 'socket.io';
 import { rateLimit } from 'express-rate-limit';
 import { PrismaClient } from '@prisma/client';
 import authController from './controllers/authController.js';
-import productRoutes from './routes/productRoutes.js';
-import categoryRoutes from './routes/categoryRoutes.js';
+import productRoutes from './controllers/productRoutes.js';
+import categoryRoutes from './controllers/categoryCont.js';
 import { setupWebSocket } from './websocket/index.js';
 import { logger } from './utils/logger.js';
 import dotenv from 'dotenv';
@@ -35,7 +35,6 @@ const prisma = new PrismaClient();
 
 app.use(cors({
   origin: function(origin, callback) {
-    // allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
@@ -49,7 +48,6 @@ app.use(cors({
   optionsSuccessStatus: 204
 }));
 
-// Explicitly handle OPTIONS preflight requests
 app.options('*', cors());
 
 app.use(express.json());
@@ -57,7 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000, 
   max: 100
 });
 app.use(limiter);

@@ -16,8 +16,7 @@ export const uploadToCloudinary = async (file) => {
       throw new Error('File not provided or path is missing');
     }
 
-    console.log('Uploading file:', file.path); // Debugging
-
+    console.log('Uploading file:', file.path); 
     const result = await cloudinary.uploader.upload(file.path);
 
     console.log('Upload successful:', result.secure_url);
